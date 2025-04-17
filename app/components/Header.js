@@ -54,7 +54,7 @@ const Header = () => {
    
     },200)
  return ()=>{
-    clearInterval(timer);
+    clearTimeout(timer);
  }
   },[searchQuery])
 
