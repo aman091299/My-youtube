@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import VideoCard from "./VideoCard";
 import { useSelector } from "react-redux";
 const VideoContainer = () => {
-  console.log("inside  videocontainer");
   const [videos, setVideos] = useState([]);
   const [filteredVideos, setFilteredVideos] = useState(videos);
   const [loading, setLoading] = useState(true);
@@ -16,7 +15,7 @@ const VideoContainer = () => {
     try {
       const data = await fetch(YOUTUBE_VIDEOS_API);
       const json = await data.json();
-      console.log(json?.items);
+    
       setVideos(json?.items);
       setFilteredVideos(json?.items);
     } catch (error) {
@@ -26,17 +25,17 @@ const VideoContainer = () => {
     }
   };
   const filterVideos = (query, videos) => {
-    console.log(query, videos);
+   
     const filteredVideos = videos.filter((vid) => {
       return vid?.snippet?.title?.toLowerCase().includes(query.toLowerCase());
     });
-    console.log(filteredVideos);
+  
     setFilteredVideos(filteredVideos);
   };
 
   
   useEffect(() => {
-    console.log("inside useeffcet in videocontainer", videos);
+  
     if (videos.length === 0) {
       getUtubeVideo(); // still fetches when empty
     } else {

@@ -7,7 +7,7 @@ import { randomName ,randomString} from '../utils/contants';
 const LiveChat = () => {
     const [message,setMessage]=useState([]);
     const [liveMessage,setLiveMessage]=useState('')
-    console.log(message)
+  
  
     useEffect (()=>{
         const timer=setInterval(()=>{

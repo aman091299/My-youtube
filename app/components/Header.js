@@ -6,8 +6,10 @@ import Suggetion from './Suggetion';
 import { useDispatch ,useSelector} from 'react-redux';
 import { toggleSideBar } from '../utils/stores/sideBarSlice';
 import { settingSearchQuery,chacheResult } from '../utils/stores/searchQuerySlice';
+import { useRef } from 'react';
 
 const Header = () => {
+  const suggestionBoxRef = useRef();
   const [searchQuery,setSearchQuery]=useState('');
   const [querySuggestions,setQuerySuggestions]=useState('')
   const checkCacheData=useSelector(store=>store.searchQuery.chacheSuggestion);
@@ -19,11 +21,26 @@ const Header = () => {
   
     const data=await fetch(YOUTUBE_SUGGESTION_API+searchQuery)
     const json=await data.json();
-    console.log(json[1])
+
     setQuerySuggestions(json[1])
     dispatch(chacheResult({[searchQuery]:json[1]}));
   }
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        suggestionBoxRef.current &&
+        !suggestionBoxRef.current.contains(event.target)
+      ) {
+        setQuerySuggestions([]);
+      }
+    };
+  
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
   
   useEffect(()=>{
   const timer=  setTimeout(()=>{
@@ -65,7 +82,7 @@ const Header = () => {
       <div className="relative  col-span-8">
         <input type="text"  value={searchQuery}
         
-          
+       
          onChange={(e)=>{
           setSearchQuery(e.target.value)
        
@@ -75,7 +92,7 @@ const Header = () => {
         <button className="opacity-100 border border-gray-500 bg-[#f0f0f0] hover:bg-gray-200 py-2 px-6 rounded-r-4xl shadow" onClick={(e)=>{
           dispatch(settingSearchQuery(searchQuery));
         }}>🔍</button>
-        <div className="w-[500px] absolute bg-white shadow-lg  py-1 rounded-lg z-30">
+        <div  ref={suggestionBoxRef} className="w-[500px] absolute bg-white shadow-lg  py-1 rounded-lg z-30" >
         {
           querySuggestions?.length !==0 && querySuggestions?.map((sug)=>(<Suggetion key={sug} suggestion={sug} setSearchQuery={setSearchQuery} setQuerySuggestions={setQuerySuggestions}/>))
         }
