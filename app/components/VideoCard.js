@@ -2,6 +2,7 @@
 
 import { useSelector } from "react-redux";
 import Image from "next/image";
+import Link from "next/link";
 
 const VideoCard = ({ info }) => {
   const { snippet, statistics } = info;
@@ -10,6 +11,7 @@ const VideoCard = ({ info }) => {
 
   return (
     <div className="m-4 p-2 shadow">
+    <Link href={"/watch?v=" +info.id}>
       <Image
         src={thumbnails.high.url}
         width={showSideBar?220 : 200}
@@ -22,6 +24,7 @@ const VideoCard = ({ info }) => {
         <li>{channelTitle}</li>
         <li>{statistics.viewCount}</li>
       </ul>
+      </Link>
     </div>
   );
 };

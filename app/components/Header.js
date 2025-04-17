@@ -3,13 +3,15 @@ import {useState,useEffect} from 'react';
 import Image from "next/image";
 import { YOUTUBE_SUGGESTION_API } from '../utils/contants';
 import Suggetion from './Suggetion';
-import { useDispatch } from 'react-redux';
+import { useDispatch ,useSelector} from 'react-redux';
 import { toggleSideBar } from '../utils/stores/sideBarSlice';
-import { settingSearchQuery } from '../utils/stores/searchQuerySlice';
+import { settingSearchQuery,chacheResult } from '../utils/stores/searchQuerySlice';
 
 const Header = () => {
   const [searchQuery,setSearchQuery]=useState('');
   const [querySuggestions,setQuerySuggestions]=useState('')
+  const checkCacheData=useSelector(store=>store.searchQuery.chacheSuggestion);
+
   const dispatch=useDispatch();
 
    
@@ -17,15 +19,22 @@ const Header = () => {
   
     const data=await fetch(YOUTUBE_SUGGESTION_API+searchQuery)
     const json=await data.json();
-  
+    console.log(json[1])
     setQuerySuggestions(json[1])
+    dispatch(chacheResult({[searchQuery]:json[1]}));
   }
 
   
   useEffect(()=>{
   const timer=  setTimeout(()=>{
-      getSuggetionData(searchQuery);
-      console.log("inside set interval")
+  
+      if(!checkCacheData[searchQuery.trim()] && searchQuery !==''){
+        getSuggetionData(searchQuery);
+      }
+      else{
+        setQuerySuggestions(checkCacheData[searchQuery]);
+      }
+   
     },200)
  return ()=>{
     clearInterval(timer);
@@ -55,7 +64,7 @@ const Header = () => {
       </div>
       <div className="relative  col-span-8">
         <input type="text"  value={searchQuery}
-          onBlur={()=>setQuerySuggestions('')}
+        
           
          onChange={(e)=>{
           setSearchQuery(e.target.value)
@@ -68,7 +77,7 @@ const Header = () => {
         }}>🔍</button>
         <div className="w-[500px] absolute bg-white shadow-lg  py-1 rounded-lg z-30">
         {
-          querySuggestions.length !==0 && querySuggestions?.map((sug)=>(<Suggetion key={sug} suggestion={sug} setSearchQuery={setSearchQuery} setQuerySuggestions={setQuerySuggestions}/>))
+          querySuggestions?.length !==0 && querySuggestions?.map((sug)=>(<Suggetion key={sug} suggestion={sug} setSearchQuery={setSearchQuery} setQuerySuggestions={setQuerySuggestions}/>))
         }
         
       </div>
@@ -78,7 +87,7 @@ const Header = () => {
         <Image
           width={40}
           height={20}
-          alt="Youtube logo"
+          alt="user icon logo"
           src="https://www.iconpacks.net/icons/2/free-user-icon-3296-thumb.png"
         />
       </div>
